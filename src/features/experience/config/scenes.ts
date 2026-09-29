@@ -8,6 +8,7 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Exterior / Frente de la casa",
     description: "Inicio del recorrido por la casa.",
     visualPlaceholder: "Imagen del exterior — pendiente",
+    backgroundImage: "/experience/scenes/exterior.webp",
     nextSceneId: "recibidor",
   },
   {
@@ -17,6 +18,7 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Recibidor / Entrada",
     description: "Continuamos por la entrada de la casa.",
     visualPlaceholder: "Imagen del recibidor — pendiente",
+    backgroundImage: "/experience/scenes/recibidor.webp",
     nextSceneId: "habitacion",
   },
   {
@@ -26,6 +28,7 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Habitación personal",
     description: "Visitamos el espacio personal de la casa.",
     visualPlaceholder: "Imagen de la habitación — pendiente",
+    backgroundImage: "/experience/scenes/habitacion.webp",
     nextSceneId: "diseno",
   },
   {
@@ -35,6 +38,7 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Espacio de diseño",
     description: "Recorremos el ambiente arquitectónico.",
     visualPlaceholder: "Imagen del espacio de diseño — pendiente",
+    backgroundImage: "/experience/scenes/espacio-diseno.webp",
     nextSceneId: "sala",
   },
   {
@@ -44,6 +48,7 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Sala / Espacio social",
     description: "Llegamos al espacio social de la casa.",
     visualPlaceholder: "Imagen de la sala — pendiente",
+    backgroundImage: "/experience/scenes/sala.webp",
     nextSceneId: "salida",
   },
   {
@@ -53,5 +58,6 @@ export const scenes: readonly ExperienceSceneConfig[] = [
     title: "Salida / Cierre",
     description: "Fin del recorrido por la casa.",
     visualPlaceholder: "Imagen de la salida — pendiente",
+    backgroundImage: "/experience/scenes/salida.webp",
   },
 ];

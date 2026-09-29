@@ -5,5 +5,6 @@ export interface ExperienceSceneConfig {
   title: string;
   description?: string;
   visualPlaceholder: string;
+  backgroundImage?: string;
   nextSceneId?: string;
 }
