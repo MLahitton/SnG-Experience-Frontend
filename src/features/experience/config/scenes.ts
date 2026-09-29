@@ -1,0 +1,57 @@
+import type { ExperienceSceneConfig } from "@/features/experience/types/experience";
+
+export const scenes: readonly ExperienceSceneConfig[] = [
+  {
+    id: "exterior",
+    order: 1,
+    name: "exterior",
+    title: "Exterior / Frente de la casa",
+    description: "Inicio del recorrido por la casa.",
+    visualPlaceholder: "Imagen del exterior — pendiente",
+    nextSceneId: "recibidor",
+  },
+  {
+    id: "recibidor",
+    order: 2,
+    name: "recibidor",
+    title: "Recibidor / Entrada",
+    description: "Continuamos por la entrada de la casa.",
+    visualPlaceholder: "Imagen del recibidor — pendiente",
+    nextSceneId: "habitacion",
+  },
+  {
+    id: "habitacion",
+    order: 3,
+    name: "habitacion",
+    title: "Habitación personal",
+    description: "Visitamos el espacio personal de la casa.",
+    visualPlaceholder: "Imagen de la habitación — pendiente",
+    nextSceneId: "diseno",
+  },
+  {
+    id: "diseno",
+    order: 4,
+    name: "diseno",
+    title: "Espacio de diseño",
+    description: "Recorremos el ambiente arquitectónico.",
+    visualPlaceholder: "Imagen del espacio de diseño — pendiente",
+    nextSceneId: "sala",
+  },
+  {
+    id: "sala",
+    order: 5,
+    name: "sala",
+    title: "Sala / Espacio social",
+    description: "Llegamos al espacio social de la casa.",
+    visualPlaceholder: "Imagen de la sala — pendiente",
+    nextSceneId: "salida",
+  },
+  {
+    id: "salida",
+    order: 6,
+    name: "salida",
+    title: "Salida / Cierre",
+    description: "Fin del recorrido por la casa.",
+    visualPlaceholder: "Imagen de la salida — pendiente",
+  },
+];
