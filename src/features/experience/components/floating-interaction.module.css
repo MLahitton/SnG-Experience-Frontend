@@ -1,0 +1,38 @@
+.card {
+  position: absolute;
+  top: max(7rem, 18dvh);
+  right: 7%;
+  width: 21rem;
+  max-width: calc(100% - 3rem);
+  max-height: calc(100dvh - max(7rem, 18dvh) - 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.875rem;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 0.5rem;
+  background: rgb(32 35 33 / 70%);
+  color: #f5f5f4;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  backdrop-filter: blur(2px);
+  color-scheme: dark;
+}
+.card label, .card legend {
+  font-size: 11px;
+  line-height: 1.35;
+}
+.card nav button {
+  min-height: 30px;
+  padding: 0.375rem 0.625rem;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+@media (max-width: 639px) {
+  .card {
+    top: 7rem;
+    right: 1.5rem;
+    max-height: calc(100dvh - 8rem);
+  }
+  .card nav button { min-height: 40px; }
+}

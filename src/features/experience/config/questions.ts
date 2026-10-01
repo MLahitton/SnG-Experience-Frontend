@@ -48,6 +48,7 @@ export const questions: readonly Question[] = [
     // La fuente solo presenta placeholder; se reutiliza como etiqueta accesible.
     text: "Descríbelo brevemente", placeholder: "Descríbelo brevemente",
     condition: { questionId: "tipo", operator: "equals", value: "otro" },
+    clearWhenHidden: true,
   },
   {
     id: "vanos_grandes", sceneId: "recibidor", order: 4, type: "single-choice", required: true,

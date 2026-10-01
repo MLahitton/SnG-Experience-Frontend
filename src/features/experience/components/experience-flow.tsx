@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useQuestionAudioEffect } from "@/features/experience/audio/use-question-audio-effect";
+import { ExperienceAudioProvider, ExperienceAudioControl } from "@/features/experience/audio/audio-provider";
 import { ExperienceScene } from "@/features/experience/components/experience-scene";
 import { scenes } from "@/features/experience/config/scenes";
 import { questions } from "@/features/experience/config/questions";
 import { questionGroups } from "@/features/experience/config/question-groups";
+import { getQuestionSteps } from "@/features/experience/utils/question-steps";
 import { isAnswerValid, isQuestionVisible } from "@/features/experience/types/question";
 import type { Answers, AnswerValue, QuestionId } from "@/features/experience/types/question";
 
@@ -20,13 +23,20 @@ const buttonClassName =
   "min-h-11 rounded-sm px-4 py-2.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-700 disabled:cursor-not-allowed disabled:opacity-40";
 
 export function ExperienceFlow() {
+  return <ExperienceAudioProvider><ExperienceFlowContent /></ExperienceAudioProvider>;
+}
+
+function ExperienceFlowContent() {
   const [currentGroupId, setCurrentGroupId] = useState(getSceneGroups(orderedScenes[0].id)[0].id);
   const [answers, setAnswers] = useState<Answers>({});
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const currentGroup = questionGroups.find((group) => group.id === currentGroupId)!;
   const currentIndex = orderedScenes.findIndex(
     (scene) => scene.id === currentGroup.sceneId,
   );
   const currentScene = orderedScenes[currentIndex];
+  const immersive = currentScene.visualVariant === "immersive";
+  const singleQuestion = currentScene.questionPresentation === "single";
   const previousScene = orderedScenes[currentIndex - 1];
   const nextScene = orderedScenes.find(
     (scene) => scene.id === currentScene.nextSceneId,
@@ -41,7 +51,41 @@ export function ExperienceFlow() {
   const groupQuestions = currentGroup.questionIds
     .map((id) => questionsById.get(id)!)
     .filter((question) => isQuestionVisible(question, answers));
-  const canAdvance = groupQuestions.every((question) => isAnswerValid(question, answers[question.id]));
+  const questionSteps = getQuestionSteps(currentGroup.questionIds.map((id) => questionsById.get(id)!), answers);
+  const sceneProgress = singleQuestion && currentScene.questionProgressScope === "scene";
+  const stepCounts = sceneProgress ? sceneGroups.map((group) =>
+    getQuestionSteps(group.questionIds.map((id) => questionsById.get(id)!), answers).length) : [];
+  const questionProgress = {
+    current: activeQuestionIndex + 1 + stepCounts.slice(0, currentGroupIndex).reduce((sum, count) => sum + count, 0),
+    total: sceneProgress ? stepCounts.reduce((sum, count) => sum + count, 0) : questionSteps.length,
+  };
+  const visibleQuestions = singleQuestion ? questionSteps[activeQuestionIndex] : groupQuestions;
+  const activeQuestion = singleQuestion ? visibleQuestions[0] : undefined;
+  useQuestionAudioEffect(activeQuestion?.id, activeQuestion ? answers[activeQuestion.id] : undefined);
+  const hasPreviousQuestion = singleQuestion && activeQuestionIndex > 0;
+  const hasNextQuestion = singleQuestion && activeQuestionIndex < questionSteps.length - 1;
+  const canAdvance = visibleQuestions.every((question) => isAnswerValid(question, answers[question.id]));
+
+  function goBack() {
+    if (hasPreviousQuestion) {
+      setActiveQuestionIndex(activeQuestionIndex - 1);
+    } else if (previousGroup) {
+      const targetScene = orderedScenes.find((scene) => scene.id === previousGroup.sceneId)!;
+      const targetSteps = getQuestionSteps(previousGroup.questionIds.map((id) => questionsById.get(id)!), answers);
+      setActiveQuestionIndex(targetScene.questionPresentation === "single" ? targetSteps.length - 1 : 0);
+      setCurrentGroupId(previousGroup.id);
+    }
+  }
+
+  function goForward() {
+    if (!canAdvance) return;
+    if (hasNextQuestion) {
+      setActiveQuestionIndex(activeQuestionIndex + 1);
+    } else if (nextGroup) {
+      setActiveQuestionIndex(0);
+      setCurrentGroupId(nextGroup.id);
+    }
+  }
 
   function handleAnswerChange(id: QuestionId, value: AnswerValue) {
     setAnswers((previous) => {
@@ -56,43 +100,43 @@ export function ExperienceFlow() {
   }
 
   return (
-    <main lang="es" className="isolate flex h-dvh w-full flex-col overflow-hidden bg-[#343b37] font-sans text-stone-100">
-      <header className="z-10 flex shrink-0 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-white/15 px-5 py-4 sm:px-8 lg:px-10">
-        <p className="text-base font-medium tracking-wide">Steel &amp; Glass</p>
+    <main lang="es" className={`${immersive ? "relative " : ""}isolate flex h-dvh w-full flex-col overflow-hidden bg-[#343b37] font-sans text-stone-100`}>
+      <header className={immersive ? "absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-4 px-5 py-3 text-shadow-sm text-shadow-black sm:px-8 lg:px-10" : "z-10 flex shrink-0 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-white/15 px-5 py-4 sm:px-8 lg:px-10"}>
+        <p className={immersive ? "text-sm font-normal tracking-[0.12em]" : "text-base font-medium tracking-wide"}>Steel &amp; Glass</p>
         <p aria-live="polite" aria-atomic="true" className="text-xs tracking-wide text-stone-200">
-          Paso {currentIndex + 1} de {orderedScenes.length}
+          <span className={immersive ? "sr-only" : undefined}>Paso {currentIndex + 1} de {orderedScenes.length}</span>
+          {immersive && <span aria-hidden="true" className="font-light tracking-[0.2em] tabular-nums">{String(currentIndex + 1).padStart(2, "0")} / {String(orderedScenes.length).padStart(2, "0")}</span>}
+          {immersive && <span aria-hidden="true" className="mt-2 block h-px w-24 bg-white/30"><span className="block h-px bg-white" style={{ width: `${((currentIndex + 1) / orderedScenes.length) * 100}%` }} /></span>}
         </p>
+        <ExperienceAudioControl />
       </header>
       <ExperienceScene
         scene={currentScene}
-        questions={groupQuestions}
+        questions={visibleQuestions}
         answers={answers}
         onAnswerChange={handleAnswerChange}
-        groupId={currentGroupId}
-        groupProgress={`Sección ${currentGroupIndex + 1} de ${sceneGroups.length}`}
+        groupId={singleQuestion ? `${currentGroupId}-${activeQuestionIndex}` : currentGroupId}
+        questionProgress={singleQuestion ? questionProgress : undefined}
+        groupProgress={immersive ? <><span className="sr-only">Sección {currentGroupIndex + 1} de {sceneGroups.length}</span><span aria-hidden="true" className="font-light tracking-[0.18em] tabular-nums">{String(currentGroupIndex + 1).padStart(2, "0")} / {String(sceneGroups.length).padStart(2, "0")}</span></> : `Sección ${currentGroupIndex + 1} de ${sceneGroups.length}`}
         navigation={
           <>
-            {!canAdvance && <p className="mb-3 text-xs leading-relaxed text-stone-600" role="status">Completa las preguntas obligatorias visibles{nextGroup ? " para continuar" : ""}.</p>}
-      <nav aria-label="Navegación del recorrido" className="flex flex-wrap items-center justify-between gap-3">
+            {!immersive && !canAdvance && <p className={immersive ? "mb-3 text-xs leading-relaxed text-stone-300" : "mb-3 text-xs leading-relaxed text-stone-600"} role="status">Completa las preguntas obligatorias visibles{nextGroup ? " para continuar" : ""}.</p>}
+      <nav aria-label="Navegación del recorrido" className={immersive ? "flex flex-wrap items-center justify-end gap-2" : "flex flex-wrap items-center justify-between gap-3"}>
+        {(!immersive || hasPreviousQuestion || previousGroup) && <button
+          type="button"
+          className={`${buttonClassName} ${immersive ? "rounded-md text-stone-200 enabled:hover:bg-white/10 focus-visible:outline-stone-100" : "border border-stone-300 text-stone-700 enabled:hover:bg-stone-200"}`}
+          disabled={!hasPreviousQuestion && !previousGroup}
+          onClick={goBack}
+        >
+          {immersive && <span aria-hidden="true">← </span>}Anterior
+        </button>}
         <button
           type="button"
-          className={`${buttonClassName} border border-stone-300 text-stone-700 enabled:hover:bg-stone-200`}
-          disabled={!previousGroup}
-          onClick={() => {
-            if (previousGroup) setCurrentGroupId(previousGroup.id);
-          }}
+          className={`${immersive ? "min-h-10 rounded-sm border border-white/25 bg-white/10 px-3 py-2 text-sm font-medium text-stone-50 enabled:hover:border-white/45 enabled:hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-100 disabled:cursor-not-allowed disabled:opacity-40" : `${buttonClassName} bg-stone-800 text-stone-50 enabled:hover:bg-stone-700`}`}
+          disabled={(!hasNextQuestion && !nextGroup) || !canAdvance}
+          onClick={goForward}
         >
-          Anterior
-        </button>
-        <button
-          type="button"
-          className={`${buttonClassName} bg-stone-800 text-stone-50 enabled:hover:bg-stone-700`}
-          disabled={!nextGroup || !canAdvance}
-          onClick={() => {
-            if (nextGroup && canAdvance) setCurrentGroupId(nextGroup.id);
-          }}
-        >
-          Continuar
+          Continuar{immersive && <span aria-hidden="true"> →</span>}
         </button>
       </nav>
           </>

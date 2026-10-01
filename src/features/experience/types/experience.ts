@@ -6,5 +6,8 @@ export interface ExperienceSceneConfig {
   description?: string;
   visualPlaceholder: string;
   backgroundImage?: string;
+  visualVariant?: "immersive";
+  questionPresentation?: "single";
+  questionProgressScope?: "group" | "scene";
   nextSceneId?: string;
 }

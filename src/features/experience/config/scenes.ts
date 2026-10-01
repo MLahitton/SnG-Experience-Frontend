@@ -3,6 +3,8 @@ import type { ExperienceSceneConfig } from "@/features/experience/types/experien
 export const scenes: readonly ExperienceSceneConfig[] = [
   {
     id: "exterior",
+    visualVariant: "immersive",
+    questionPresentation: "single",
     order: 1,
     name: "exterior",
     title: "Exterior / Frente de la casa",
@@ -13,6 +15,8 @@ export const scenes: readonly ExperienceSceneConfig[] = [
   },
   {
     id: "recibidor",
+    visualVariant: "immersive",
+    questionPresentation: "single",
     order: 2,
     name: "recibidor",
     title: "Recibidor / Entrada",
@@ -23,6 +27,9 @@ export const scenes: readonly ExperienceSceneConfig[] = [
   },
   {
     id: "habitacion",
+    visualVariant: "immersive",
+    questionPresentation: "single",
+    questionProgressScope: "scene",
     order: 3,
     name: "habitacion",
     title: "Habitación personal",

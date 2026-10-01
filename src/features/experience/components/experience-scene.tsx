@@ -1,3 +1,4 @@
+import styles from "./floating-interaction.module.css";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import type { ExperienceSceneConfig } from "@/features/experience/types/experience";
@@ -7,19 +8,22 @@ import { QuestionRenderer } from "@/features/experience/components/question-rend
 interface ExperienceSceneProps {
   scene: ExperienceSceneConfig;
   groupId: string;
-  groupProgress: string;
+  groupProgress: ReactNode;
+  questionProgress?: { current: number; total: number };
   navigation: ReactNode;
   questions: readonly Question[];
   answers: Answers;
   onAnswerChange: (id: QuestionId, value: AnswerValue) => void;
 }
 
-export function ExperienceScene({ scene, questions, answers, onAnswerChange, groupId, groupProgress, navigation }: ExperienceSceneProps) {
+export function ExperienceScene({ scene, questions, answers, onAnswerChange, groupId, groupProgress, questionProgress, navigation }: ExperienceSceneProps) {
+  const immersive = scene.visualVariant === "immersive";
+  const floatingInteraction = immersive && scene.id === "habitacion" && questions[0]?.type === "scale" ? questions[0] : undefined;
   return (
-    <section aria-labelledby="scene-title" className="relative grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,3fr)] gap-3 overflow-hidden px-3 pb-3 sm:px-6 sm:pb-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:grid-rows-1 lg:gap-10 lg:px-10 lg:py-8">
+    <section aria-labelledby={immersive ? undefined : "scene-title"} aria-label={immersive ? scene.title : undefined} className={floatingInteraction ? "relative min-h-0 flex-1 overflow-hidden" : immersive ? "relative flex min-h-0 flex-1 items-end justify-center overflow-hidden px-3 pt-16 pb-2.5 sm:px-6 sm:pb-4 lg:px-10" : "relative grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,3fr)] gap-3 overflow-hidden px-3 pb-3 sm:px-6 sm:pb-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:grid-rows-1 lg:gap-10 lg:px-10 lg:py-8"}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[#343b37]">
         {scene.backgroundImage ? (
-          <div className="relative h-[40%] w-full lg:h-full">
+          <div className={immersive ? "relative h-full w-full" : "relative h-[40%] w-full lg:h-full"}>
             <Image
               src={scene.backgroundImage}
               alt=""
@@ -36,7 +40,7 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
           </>
         )}
       </div>
-      <div className="flex min-h-0 min-w-0 flex-col justify-center px-2 lg:justify-end lg:pb-8">
+      {!immersive && <div className="flex min-h-0 min-w-0 flex-col justify-center px-2 lg:justify-end lg:pb-8">
         <div className={scene.backgroundImage ? "w-fit max-w-full rounded-sm bg-stone-950/70 px-3 py-2 lg:p-4" : undefined}>
         <h1 id="scene-title" className="text-lg font-normal tracking-wide sm:text-xl lg:max-w-sm lg:text-2xl">
           {scene.title}
@@ -44,19 +48,25 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
         {scene.description && <p className="mt-2 hidden max-w-sm text-sm leading-relaxed text-stone-300 lg:block">{scene.description}</p>}
         {!scene.backgroundImage && <p className="mt-2 text-xs text-stone-300 lg:mt-6">{scene.visualPlaceholder}</p>}
         </div>
-      </div>
-      <div className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-sm border border-white/30 bg-[#f5f3ee]/98 text-stone-800 shadow-xl [color-scheme:light]">
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stone-300/70 px-5 py-3 sm:px-6">
-          <p aria-live="polite" aria-atomic="true" className="text-xs font-medium tracking-wide">{groupProgress}</p>
-          <p className="text-xs text-stone-600">* Campo obligatorio.</p>
+      </div>}
+      <div className={floatingInteraction ? styles.card : immersive ? `flex w-full max-w-5xl min-w-0 flex-wrap items-end gap-x-7 gap-y-3 px-4 sm:px-5 py-3.5 sm:py-4 rounded-lg border border-white/10 bg-[#202321]/70 text-stone-100 shadow-md backdrop-blur-sm [color-scheme:dark]` : "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-sm border border-white/30 bg-[#f5f3ee]/98 text-stone-800 shadow-xl [color-scheme:light]"}>
+        {floatingInteraction && <svg aria-hidden="true" focusable="false" viewBox="0 0 200 80" preserveAspectRatio="none"
+          className="pointer-events-none absolute top-12 right-full h-12 w-5 overflow-visible text-stone-100/65 sm:h-16 sm:w-16 lg:h-20 lg:w-[18vw]">
+          <path d="M200 4 H145 L8 68" fill="none" stroke="currentColor" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <circle cx="8" cy="68" r="3" fill="currentColor" />
+        </svg>}
+        <div className={immersive ? "flex w-full shrink-0 items-center gap-2 text-stone-300 sm:w-auto sm:min-w-16 sm:self-start sm:pt-1" : "flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-stone-300/70 px-5 py-3 sm:px-6"}>
+          {!immersive && <p aria-live="polite" aria-atomic="true" className="text-xs font-medium tracking-wide">{groupProgress}</p>}
+          {questionProgress && <p aria-live="polite" aria-atomic="true" className={floatingInteraction ? "text-[10px] text-stone-300/80" : "text-xs text-stone-300"}><span className="sr-only">Pregunta {questionProgress.current} de {questionProgress.total}</span><span aria-hidden="true" className="tracking-widest tabular-nums">{String(questionProgress.current).padStart(2, "0")} / {String(questionProgress.total).padStart(2, "0")}</span></p>}
+          <p className={immersive ? "sr-only" : "text-xs text-stone-600"}>* Campo obligatorio.</p>
         </div>
-        <div key={groupId} className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5 wrap-anywhere sm:px-6">
+        <div key={groupId} className={floatingInteraction ? "min-h-0 min-w-0 space-y-4 overflow-y-auto overscroll-contain p-1 wrap-anywhere [&_legend]:text-xs [&_label]:text-xs" : immersive ? `min-w-0 basis-full space-y-3 wrap-anywhere sm:flex-1 sm:basis-72 ${questions[0]?.type === "scale" ? "max-h-[calc(100dvh-14rem)] overflow-y-auto overscroll-contain p-1" : ""}` : "min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5 wrap-anywhere sm:px-6"}>
           {questions.map((question) => (
-            <QuestionRenderer key={question.id} question={question} value={answers[question.id]}
+            <QuestionRenderer key={question.id} question={question} value={answers[question.id]} variant={scene.visualVariant} layout={immersive ? "dock" : undefined} refinedScale={question.id === floatingInteraction?.id}
               onChange={(value) => onAnswerChange(question.id, value)} />
           ))}
         </div>
-        <div className="shrink-0 border-t border-stone-300/70 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
+        <div className={floatingInteraction ? "w-full shrink-0 border-t border-white/10 pt-2 pb-[env(safe-area-inset-bottom)] [&_button]:px-3 [&_button]:text-xs [&_nav]:justify-between" : immersive ? "ml-auto w-full shrink-0 pb-[env(safe-area-inset-bottom)] sm:w-auto" : "shrink-0 border-t border-stone-300/70 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"}>
           {navigation}
         </div>
       </div>
