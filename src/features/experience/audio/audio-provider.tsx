@@ -9,6 +9,9 @@ const AudioContext = createContext<ExperienceAudioController | null>(null);
 
 export function ExperienceAudioProvider({ children }: { children: ReactNode }) {
   const [controller] = useState(() => new ExperienceAudioController(experienceAudioConfig));
+  useEffect(() => {
+    controller.setBaseVolume(experienceAudioConfig.baseVolume);
+  }, [controller]);
   useEffect(() => () => controller.dispose(), [controller]);
   return <AudioContext.Provider value={controller}>{children}</AudioContext.Provider>;
 }

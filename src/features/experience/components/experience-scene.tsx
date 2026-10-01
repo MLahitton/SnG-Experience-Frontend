@@ -1,3 +1,9 @@
+import { SecuritySceneOverlay } from "./security-scene-overlay";
+import { securityEffect, securityModes } from "../config/security-effects";
+import { useState } from "react";
+import { ThermalPreferenceControl } from "./thermal-preference-control";
+import thermalStyles from "./thermal-preference.module.css";
+import { thermalEffect, thermalTone } from "../config/thermal-effects";
 import styles from "./floating-interaction.module.css";
 import type { ReactNode } from "react";
 import Image from "next/image";
@@ -19,6 +25,15 @@ interface ExperienceSceneProps {
 export function ExperienceScene({ scene, questions, answers, onAnswerChange, groupId, groupProgress, questionProgress, navigation }: ExperienceSceneProps) {
   const immersive = scene.visualVariant === "immersive";
   const floatingInteraction = immersive && scene.id === "habitacion" && questions[0]?.type === "scale" ? questions[0] : undefined;
+  const securityVisible = scene.id === securityEffect.sceneId && questions.some((question) => question.id === securityEffect.questionId);
+  const activeSecurityModes = securityVisible ? securityModes(answers[securityEffect.questionId]) : [];
+  const thermalQuestion = scene.id === thermalEffect.sceneId ? questions.find((question) => question.id === thermalEffect.questionId) : undefined;
+  const [thermalPreview, setThermalPreview] = useState<{ answer: AnswerValue; tone: number }>();
+  const thermalAnswer = answers[thermalEffect.questionId];
+  const tone = scene.id === thermalEffect.sceneId
+    ? thermalPreview && thermalPreview.answer === thermalAnswer
+      ? thermalPreview.tone : thermalTone(thermalAnswer)
+    : 0;
   return (
     <section aria-labelledby={immersive ? undefined : "scene-title"} aria-label={immersive ? scene.title : undefined} className={floatingInteraction ? "relative min-h-0 flex-1 overflow-hidden" : immersive ? "relative flex min-h-0 flex-1 items-end justify-center overflow-hidden px-3 pt-16 pb-2.5 sm:px-6 sm:pb-4 lg:px-10" : "relative grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,3fr)] gap-3 overflow-hidden px-3 pb-3 sm:px-6 sm:pb-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:grid-rows-1 lg:gap-10 lg:px-10 lg:py-8"}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[#343b37]">
@@ -40,6 +55,9 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
           </>
         )}
       </div>
+      {scene.id === thermalEffect.sceneId && <div aria-hidden="true" className={`-z-10 ${thermalStyles.overlay}`}
+        style={{ backgroundColor: tone < 0 ? `rgba(65, 145, 235, ${Math.abs(tone) * 0.7})` : `rgba(245, 165, 65, ${tone * 0.4})` }} />}
+      {activeSecurityModes.map((mode) => <SecuritySceneOverlay key={mode} mode={mode} />)}
       {!immersive && <div className="flex min-h-0 min-w-0 flex-col justify-center px-2 lg:justify-end lg:pb-8">
         <div className={scene.backgroundImage ? "w-fit max-w-full rounded-sm bg-stone-950/70 px-3 py-2 lg:p-4" : undefined}>
         <h1 id="scene-title" className="text-lg font-normal tracking-wide sm:text-xl lg:max-w-sm lg:text-2xl">
@@ -49,6 +67,7 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
         {!scene.backgroundImage && <p className="mt-2 text-xs text-stone-300 lg:mt-6">{scene.visualPlaceholder}</p>}
         </div>
       </div>}
+      <div className={floatingInteraction ? styles.cards : "contents"}>
       <div className={floatingInteraction ? styles.card : immersive ? `flex w-full max-w-5xl min-w-0 flex-wrap items-end gap-x-7 gap-y-3 px-4 sm:px-5 py-3.5 sm:py-4 rounded-lg border border-white/10 bg-[#202321]/70 text-stone-100 shadow-md backdrop-blur-sm [color-scheme:dark]` : "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-sm border border-white/30 bg-[#f5f3ee]/98 text-stone-800 shadow-xl [color-scheme:light]"}>
         {floatingInteraction && <svg aria-hidden="true" focusable="false" viewBox="0 0 200 80" preserveAspectRatio="none"
           className="pointer-events-none absolute top-12 right-full h-12 w-5 overflow-visible text-stone-100/65 sm:h-16 sm:w-16 lg:h-20 lg:w-[18vw]">
@@ -61,7 +80,7 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
           <p className={immersive ? "sr-only" : "text-xs text-stone-600"}>* Campo obligatorio.</p>
         </div>
         <div key={groupId} className={floatingInteraction ? "min-h-0 min-w-0 space-y-4 overflow-y-auto overscroll-contain p-1 wrap-anywhere [&_legend]:text-xs [&_label]:text-xs" : immersive ? `min-w-0 basis-full space-y-3 wrap-anywhere sm:flex-1 sm:basis-72 ${questions[0]?.type === "scale" ? "max-h-[calc(100dvh-14rem)] overflow-y-auto overscroll-contain p-1" : ""}` : "min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5 wrap-anywhere sm:px-6"}>
-          {questions.map((question) => (
+          {(floatingInteraction ? questions.slice(0, 1) : questions).map((question) => (
             <QuestionRenderer key={question.id} question={question} value={answers[question.id]} variant={scene.visualVariant} layout={immersive ? "dock" : undefined} refinedScale={question.id === floatingInteraction?.id}
               onChange={(value) => onAnswerChange(question.id, value)} />
           ))}
@@ -69,6 +88,21 @@ export function ExperienceScene({ scene, questions, answers, onAnswerChange, gro
         <div className={floatingInteraction ? "w-full shrink-0 border-t border-white/10 pt-2 pb-[env(safe-area-inset-bottom)] [&_button]:px-3 [&_button]:text-xs [&_nav]:justify-between" : immersive ? "ml-auto w-full shrink-0 pb-[env(safe-area-inset-bottom)] sm:w-auto" : "shrink-0 border-t border-stone-300/70 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"}>
           {navigation}
         </div>
+      </div>
+      {floatingInteraction && questions.length > 1 && <div className={`${styles.card} ${styles.dependent}`}>
+        {questions.slice(1).map((question) => (
+          question.id === thermalQuestion?.id && question.type === "multi-choice" ?
+          <ThermalPreferenceControl key={question.id} question={question} value={answers[question.id]}
+            order={thermalEffect.positions.map((position) => position.optionValue)} position={tone}
+            onChange={(value, position) => {
+              setThermalPreview({ answer: value, tone: position });
+              onAnswerChange(question.id, value);
+            }} /> :
+          <QuestionRenderer key={question.id} question={question} value={answers[question.id]}
+            variant={scene.visualVariant} layout="dock"
+            onChange={(value) => onAnswerChange(question.id, value)} />
+        ))}
+      </div>}
       </div>
     </section>
   );

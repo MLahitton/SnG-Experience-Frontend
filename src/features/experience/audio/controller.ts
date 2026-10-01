@@ -102,6 +102,15 @@ export class ExperienceAudioController {
     this.setEffectiveVolume(this.state.baseVolume, duration);
   }
 
+  // Keep a mounted controller in sync with configuration edits, preserving attenuation.
+  setBaseVolume(volume: number) {
+    const baseVolume = clamp(volume);
+    if (baseVolume === this.state.baseVolume) return;
+    const factor = this.state.baseVolume > 0 ? this.state.effectiveVolume / this.state.baseVolume : 1;
+    this.update({ baseVolume });
+    this.setEffectiveVolume(baseVolume * factor);
+  }
+
   dispose() {
     this.generation++;
     this.cancelFade();

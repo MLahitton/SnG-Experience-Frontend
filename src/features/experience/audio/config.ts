@@ -4,8 +4,8 @@ export interface ExperienceAudioConfig {
   loop: boolean;
 }
 
-// Add an approved local /experience/audio/ambient.<format> source here later.
 export const experienceAudioConfig: ExperienceAudioConfig = {
-  baseVolume: 0.35,
+  source: "/experience/audio/ambient.mp3",
+  baseVolume: 1,
   loop: true,
 };

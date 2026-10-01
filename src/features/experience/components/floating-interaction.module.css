@@ -36,3 +36,52 @@
   }
   .card nav button { min-height: 40px; }
 }
+
+/* The main card keeps its original geometry; dependents are a sibling surface. */
+.cards { display: contents; }
+@media (min-width: 900px) {
+  .card:not(.dependent) {
+    top: max(6rem, calc(18dvh - 1.5rem));
+  }
+}
+.dependent {
+  top: auto;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: auto;
+  left: 7%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (max-width: 899px) {
+  .cards {
+    position: absolute;
+    top: max(7rem, 18dvh);
+    right: 7%;
+    width: 21rem;
+    max-width: calc(100% - 3rem);
+    max-height: calc(100dvh - max(7rem, 18dvh) - 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .cards > .card {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    right: auto;
+    left: auto;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 639px) {
+  .cards {
+    top: 7rem;
+    right: 1.5rem;
+    max-height: calc(100dvh - 8rem);
+  }
+}
