@@ -18,4 +18,5 @@ export const questionGroups: readonly QuestionGroup[] = [
   { id: "decision-priorities", sceneId: "salida", order: 1, questionIds: ["criterio"] },
   { id: "decision-participants", sceneId: "salida", order: 2, questionIds: ["decisor", "acceso_decisor"] },
   { id: "next-experience", sceneId: "salida", order: 3, questionIds: ["sig_paso", "origen", "origen_otro"] },
+  { id: "project-documents", sceneId: "salida", order: 4, questionIds: ["project_documents"] },
 ];

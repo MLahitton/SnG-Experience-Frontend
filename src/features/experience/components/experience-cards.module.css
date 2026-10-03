@@ -1,0 +1,69 @@
+.system {
+  --experience-card-background: rgb(32 35 33 / 70%);
+  --experience-card-border: rgb(255 255 255 / 20%);
+  --experience-card-radius: .5rem;
+  --experience-card-blur: 2px;
+  --experience-card-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  --experience-card-padding: 1rem;
+  --experience-card-gap: .75rem;
+  --experience-primary-width: clamp(22rem, 27vw, 27rem);
+  --experience-secondary-width: 22rem;
+  --experience-dock-width: 64rem;
+}
+.composition {
+  --experience-primary-width: clamp(19rem, 24vw, 22rem);
+  --experience-secondary-width: 20rem;
+  --experience-card-padding: .75rem;
+  --experience-card-gap: .5rem;
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+}
+.card { position: absolute; width: var(--experience-primary-width); max-width: calc(100% - 3rem); padding: var(--experience-card-padding); border: 1px solid var(--experience-card-border); border-radius: var(--experience-card-radius); background: var(--experience-card-background); backdrop-filter: blur(var(--experience-card-blur)); box-shadow: var(--experience-card-shadow); color: #f5f5f4; color-scheme: dark; pointer-events: auto; }
+.primary { top: max(7rem, 18%); right: 5%; }
+.left .primary { right: auto; left: 5%; }
+.wide { width: clamp(21rem, 26vw, 24rem); }
+.secondary { width: var(--experience-secondary-width); left: 5%; bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+.card legend, .card h2, .card label:not(:has(input[type="checkbox"])):not(:has(input[type="radio"])) { font-size: 12px; font-weight: 600; line-height: 1.35; }
+.card fieldset > div > label { width: 100%; min-height: 34px; padding: .25rem .375rem; font-size: 12px; line-height: 1.35; }
+.card textarea { min-height: 4.5rem; max-height: 8rem; resize: vertical; font-size: 13px; }
+.progress { margin-bottom: var(--experience-card-gap); font-size: 10px; letter-spacing: .15em; color: #d6d3d1; }
+.body { display: grid; gap: var(--experience-card-gap); min-width: 0; }
+.navigation { margin-top: .625rem; padding-top: .5rem; border-top: 1px solid rgb(255 255 255 / 10%); }
+.navigation nav { justify-content: space-between; }
+.navigation button { min-height: 32px; padding: .375rem .625rem; font-size: 11px; border-radius: 4px; }
+.card [role="listbox"] { top: calc(100% + .5rem); bottom: auto; margin-top: 0; margin-bottom: 0; }
+@media (min-width: 900px) and (max-height: 620px) {
+  .composition.composition { left: auto; width: 22rem; max-width: calc(100% - 2rem); }
+  .composition.left { left: 1rem; right: auto; }
+}
+@media (max-width: 899px), (max-height: 620px) {
+  .composition { inset: auto 1rem max(1rem, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: var(--experience-card-gap); max-height: calc(100dvh - 7rem); overflow-y: auto; pointer-events: auto; }
+  .composition .card { position: relative; inset: auto; width: 100%; max-width: none; flex-shrink: 0; }
+  .navigation button { min-height: 44px; }
+  .card fieldset > div > label { min-height: 44px; }
+  .card [role="listbox"] { position: static; max-height: 30dvh; margin-top: .5rem; }
+}
+.composition.expandedDock {
+  inset: auto 1rem max(1rem, env(safe-area-inset-bottom));
+  width: auto; max-width: none; display: flex; align-items: center;
+  max-height: calc(100dvh - 7rem); overflow-y: auto;
+}
+.expandedDock .primary {
+  position: relative; inset: auto; width: min(100%, 42rem);
+  max-width: none; margin-inline: auto; padding: .625rem .875rem;
+}
+.expandedDock .progress { margin-bottom: .375rem; font-size: 9px; }
+.expandedDock .card legend { font-size: 12px; line-height: 1.35; }
+.expandedDock fieldset > p { font-size: 10px; line-height: 1.3; }
+.expandedDock fieldset > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .25rem .5rem; }
+.expandedDock fieldset > div > label { min-height: 30px; padding: .25rem .375rem; font-size: 11px; line-height: 1.3; gap: .5rem; }
+.expandedDock .navigation { margin-top: .375rem; padding-top: .375rem; }
+.expandedDock .navigation button { min-height: 30px; padding: .25rem .5rem; font-size: 10px; }
+@media (max-width: 899px) {
+  .expandedDock fieldset > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (pointer: coarse) {
+  .expandedDock fieldset > div > label, .expandedDock .navigation button { min-height: 44px; }
+}
+@media (max-width: 479px) {
+  .expandedDock fieldset > div { grid-template-columns: 1fr; }
+}

@@ -40,6 +40,8 @@ export const scenes: readonly ExperienceSceneConfig[] = [
   },
   {
     id: "diseno",
+    visualVariant: "immersive",
+    questionPresentation: "single",
     order: 4,
     name: "diseno",
     title: "Espacio de diseño",
@@ -50,6 +52,9 @@ export const scenes: readonly ExperienceSceneConfig[] = [
   },
   {
     id: "sala",
+    visualVariant: "immersive",
+    questionPresentation: "single",
+    questionProgressScope: "scene",
     order: 5,
     name: "sala",
     title: "Sala / Espacio social",
@@ -60,6 +65,9 @@ export const scenes: readonly ExperienceSceneConfig[] = [
   },
   {
     id: "salida",
+    visualVariant: "immersive",
+    questionPresentation: "single",
+    questionProgressScope: "scene",
     order: 6,
     name: "salida",
     title: "Salida / Cierre",

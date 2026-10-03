@@ -28,7 +28,7 @@ export function ThermalPreferenceControl({ question, value, order, position, onC
         if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown", "Enter", " "].includes(event.key)) select(Number(event.currentTarget.value));
       }} />
     <div aria-hidden="true" className={styles.marks}>
-      <span>Fresco</span><span>Estable</span><span>C?lido</span>
+      <span>Fresco</span><span>Estable</span><span>Calido</span>
     </div>
     <p id={`${id}-selection`} className={styles.help}>{selected?.label ?? "Sin respuesta. Mueve el control para elegir."}</p>
   </div>;

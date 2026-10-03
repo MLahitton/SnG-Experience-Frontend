@@ -9,6 +9,12 @@ const scale = { type: "scale", min: 1, max: 5, minLabel: "Poco importante", maxL
 
 export const questions: readonly Question[] = [
   {
+    id: "project_documents", sceneId: "salida", order: 6, type: "textarea", required: false,
+    text: "Cuéntanos qué necesita tu proyecto",
+    description: "Comparte los detalles de tu proyecto y adjunta tus planos o documentos para que podamos orientarte.",
+    placeholder: "Describe los espacios, las necesidades y cualquier detalle que quieras compartir con SNG.",
+  },
+  {
     id: "asesor", sceneId: "exterior", order: 1, type: "single-choice", required: true,
     text: "¿Quién es tu asesor en Steel and Glass?",
     description: "Selecciona la persona que te compartió este diagnóstico. Tus resultados llegarán directamente a ella.",
@@ -84,7 +90,7 @@ export const questions: readonly Question[] = [
   },
   { ...scale, id: "estetica", sceneId: "diseno", order: 1, text: "Estética y diseño" },
   {
-    id: "motivo_estetica", sceneId: "diseno", order: 2, type: "multi-choice", required: true,
+    id: "motivo_estetica", sceneId: "diseno", order: 2, type: "single-choice", required: true,
     text: "¿Qué papel quieres que tenga la ventanería dentro de la arquitectura?",
     condition: { questionId: "estetica", operator: "at-least", value: 4 }, clearWhenHidden: true,
     options: options([["desaparece", "Que casi desaparezca — paisaje, luz y transparencia como protagonistas."], ["integrada", "Que se integre discretamente — acompañar la arquitectura sin competir con ella."], ["protagonismo", "Que tenga protagonismo — formas, acabados o elementos especiales como parte de la identidad."]]),

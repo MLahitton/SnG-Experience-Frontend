@@ -1,0 +1,37 @@
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -9; pointer-events: none; color: #fafaf9; }
+.line { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 1; animation: trace 1100ms ease-out both; }
+.transparency { animation: transparency 1200ms ease-out both; }
+.integration { opacity: .16; animation: settle 1100ms ease-out; }
+.prominence { opacity: .34; animation: settle 1200ms ease-out; }
+.prominence .line { stroke-width: 1.5; }
+.glass { fill: white; opacity: .025; animation: glass 1200ms ease-out; }
+.sweep { opacity: 0; animation: sweep 1200ms ease-out; }
+@keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes settle { 0% { opacity: 0; } 45% { opacity: .8; } }
+@keyframes transparency { 0% { opacity: 0; stroke-dashoffset: 1; } 40% { opacity: .6; } 100% { opacity: .04; stroke-dashoffset: 0; } }
+@keyframes glass { 0% { opacity: 0; } 40% { opacity: .12; } }
+@keyframes sweep { 0% { opacity: 0; transform: translateX(330px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateX(-180px); } }
+
+/* Only Design opts into these dimensions; the bedroom composition stays intact. */
+.cards { display: contents; }
+.cards > .main, .cards > .secondary { width: 25rem; max-width: 36vw; }
+.cards > .main.main { right: 5%; top: max(7rem, 21dvh); }
+.cards > .secondary { left: 4%; bottom: max(1.5rem, env(safe-area-inset-bottom)); width: 20rem; padding: .625rem; }
+.choices legend { font-size: 11px; line-height: 1.35; }
+.choices fieldset > div { gap: .375rem; }
+.choices label { width: 100%; min-height: 36px; padding: .375rem .5rem; font-size: 11px; line-height: 1.35; gap: .5rem; border: 1px solid rgb(255 255 255 / 18%); border-radius: .375rem; background: rgb(255 255 255 / 3%); transition: background-color 180ms, border-color 180ms; }
+.choices label:has(:checked) { border-color: rgb(255 255 255 / 65%); background: rgb(255 255 255 / 13%); }
+.choices label:has(:focus-visible) { outline: 2px solid #fafaf9; outline-offset: 3px; }
+.choices label:has(:disabled) { opacity: .4; cursor: not-allowed; }
+.choices label > span:last-child { border-radius: 2px; }
+@media (max-width: 899px) {
+  .cards { position: absolute; display: flex; flex-direction: column; gap: .75rem; top: 7rem; right: 1.5rem; width: 25rem; max-width: calc(100% - 3rem); max-height: calc(100dvh - 8rem); overflow-y: auto; overscroll-behavior: contain; }
+  .cards > .main.main, .cards > .secondary { position: relative; inset: auto; width: 100%; max-width: none; max-height: none; flex-shrink: 0; overflow: visible; }
+  .main > svg { display: none; }
+  .cards > .secondary { width: min(100%, 20rem); align-self: flex-end; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay * { animation: none; }
+  .transparency { opacity: .04; }
+  .choices label { transition: none; }
+}
